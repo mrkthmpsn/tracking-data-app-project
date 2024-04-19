@@ -3,6 +3,7 @@ File for pitch control utils
 """
 import gzip
 import io
+import json
 import time
 from typing import List
 
@@ -275,8 +276,8 @@ def decompress_gzip_pitch_control_field(stored_pitch_control_field):
     # Update the heatmap
     decompressed_data = gzip.decompress(stored_pitch_control_field)
     # Reconstruct the BytesIO object
-    buffer = io.BytesIO(decompressed_data)
-    # Load the NumPy array
-    reconstructed_pitch_control_field = np.load(buffer)
+    # buffer = io.BytesIO(decompressed_data)
+    # # Load the NumPy array
+    # reconstructed_pitch_control_field = np.load(buffer)
 
-    return reconstructed_pitch_control_field
+    return json.loads(decompressed_data)

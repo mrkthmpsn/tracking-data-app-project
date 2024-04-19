@@ -174,11 +174,18 @@ def search_area_for_value(
             )
             target_range = max(2, int(np.sqrt(distance_to_ball)))
 
+            # TODO[*] Could I adjust this so I'm compressing as numpy for the db and
+            #  un- and re-compressing as list for API?
             # Get the area
-            area = decompress_gzip_pitch_control_field(
+            pitch_control_field = decompress_gzip_pitch_control_field(
                 frame_data["pitch_control_field"]
-            )[y : y + target_range, x : x + target_range]
-
+            )
+            area = np.array(
+                [
+                    row[x : x + target_range]
+                    for row in pitch_control_field[y : y + target_range]
+                ]
+            )
             # Check if the area is fully within bounds and calculate its average
             if (
                 area.shape == (target_range, target_range)

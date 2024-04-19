@@ -5,6 +5,7 @@ Want to add pitch control field to each frame
 """
 import gzip
 import io
+import json
 import math
 
 import numpy as np
@@ -24,9 +25,12 @@ for frame in tqdm(cursor_data):
     frame["pitch_control_field"] = None
     if frame["ball_position"]["x"] is not None:
         pitch_control_field = create_frame_pitch_control_field(frame)
-        buffer = io.BytesIO()
-        np.save(buffer, pitch_control_field)
-        compressed_data = gzip.compress(buffer.getvalue())
+        # buffer = io.BytesIO()
+        # np.save(buffer, pitch_control_field)
+        # compressed_data = gzip.compress(buffer.getvalue())
+        compressed_data = gzip.compress(
+            json.dumps(pitch_control_field.tolist()).encode("utf-8")
+        )
 
         frame["pitch_control_field"] = compressed_data
 
