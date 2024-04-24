@@ -63,15 +63,3 @@ METRICA_EVENT_TYPES = [
 METRICA_SUBEVENT_TYPES = [
     event for event in METRICA_EVENTS_METADATA if event["category"] == "SUBTYPE"
 ]
-
-blah = {
-    "PASS": "team",
-    "SHOT": "team",
-    "RECOVERY": "team",
-    "FAULT_RECEIVED": "remove",  # remove? Remove before dealing with SET PIECE
-    "SET PIECE": "team",  # convert to break in play
-    "BALL OUT": "remove",  # break in play process. Remove before dealing with SET PIECE
-    "BALL LOST": "neutral",
-    "CARD": "remove",  # remove?
-    "CHALLENGE": "remove",  # neutral or opponent - remove?
-}

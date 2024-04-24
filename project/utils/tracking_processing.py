@@ -8,7 +8,7 @@ from scipy.signal import savgol_filter
 from project.utils.constants import PITCH_WIDTH_M, PITCH_LENGTH_M
 
 
-# TODO[*]: Possibly refactor this util, not sure it 's the right concept - but unimportant
+# TODO[*]: Possibly refactor this util, not sure it's the right concept - but unimportant
 def convert_to_meters(
     x: float,
     y: float,
