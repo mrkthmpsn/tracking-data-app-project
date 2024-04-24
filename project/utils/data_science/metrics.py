@@ -40,12 +40,12 @@ def _update_proximity_info(player_info, frame_data, distance_threshold, frame_ra
 
     if distance_to_ball <= distance_threshold and (
         (
-            frame_data["players"][player_info["id"]]["team"] == "TEAM_A"
+            frame_data["players"][player_info["id"]]["team"] == "FIFATMA"
             and frame_data["possession_phase"] == "FIFATMA"
         )
         or (
             (
-                frame_data["players"][player_info["id"]]["team"] == "TEAM_B"
+                frame_data["players"][player_info["id"]]["team"] == "FIFATMB"
                 and frame_data["possession_phase"] == "FIFATMB"
             )
         )
@@ -109,6 +109,11 @@ class DefensiveBlockData(BaseModel):
     right: int
     top: int
     bottom: int
+    area: float
+    north: int
+    south: int
+    east: int
+    west: int
 
 
 def get_defensive_block_boundaries(frame_data) -> Optional[DefensiveBlockData]:
@@ -121,7 +126,7 @@ def get_defensive_block_boundaries(frame_data) -> Optional[DefensiveBlockData]:
 
     # TODO[*] Can get away with it with this data, but both of these criteria filters are hacky
     out_of_possession_team = (
-        "TEAM_B" if frame_data["possession_phase"] == "FIFATMA" else "TEAM_A"
+        "FIFATMB" if frame_data["possession_phase"] == "FIFATMA" else "FIFATMA"
     )
     outfielder_positions = [
         (player_data["adj_x"], player_data["adj_y"])
@@ -141,12 +146,27 @@ def get_defensive_block_boundaries(frame_data) -> Optional[DefensiveBlockData]:
     )  # Sort by y coordinate
 
     # Get 2nd furthest in each direction, convert to integers for indexing
-    left = int(sorted_by_x[1][0])
-    right = int(sorted_by_x[-2][0])
-    top = int(sorted_by_y[1][1])
-    bottom = int(sorted_by_y[-2][1])
+    left = int((sorted_by_x[1][0] + sorted_by_x[0][0]) / 2)
+    right = int((sorted_by_x[-2][0] + sorted_by_x[-1][0]) / 2)
+    top = int((sorted_by_y[1][1] + sorted_by_y[0][1]) / 2)
+    bottom = int((sorted_by_y[-2][1] + sorted_by_y[-1][1]) / 2)
 
-    return DefensiveBlockData(left=left, right=right, top=top, bottom=bottom)
+    north = right if frame_data["possession_target_end"] == 0 else left
+    south = left if frame_data["possession_target_end"] == 0 else right
+    east = bottom if frame_data["possession_target_end"] == 0 else top
+    west = top if frame_data["possession_target_end"] == 0 else bottom
+
+    return DefensiveBlockData(
+        left=left,
+        right=right,
+        top=top,
+        bottom=bottom,
+        area=(top - bottom) * (left - right),
+        north=abs(frame_data["possession_target_end"] - north),
+        south=abs(frame_data["possession_target_end"] - south),
+        east=east,
+        west=west,
+    )
 
 
 def search_area_for_value(

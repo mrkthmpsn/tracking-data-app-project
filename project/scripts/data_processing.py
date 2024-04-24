@@ -10,16 +10,16 @@ from tqdm import tqdm
 
 from project.utils.event_data.events_processing import (
     create_possession_changes_from_events,
+    find_half_start_frames,
 )
 from project.utils.tracking_processing import (
     convert_to_meters,
     smooth_coordinates,
     calculate_speed,
 )
-from project.utils.mongo_setup import get_database
+from project.utils.mongo_setup import get_database, get_collection
 
-db = get_database("metrica_tracking")
-collection = db["frames"]
+collection = get_collection("frames")
 
 # Fetch every fifth frame
 cursor = collection.find(
@@ -71,7 +71,7 @@ for player_id, grouped_df in tqdm(grouped_data):
     grouped_df = calculate_speed(grouped_df, sample_frame_rate=(25 / 12))
 
     # Data doesn't really supply team info properly, but this is presumably right
-    grouped_df["team"] = np.where(player_id <= 10, "TEAM_A", "TEAM_B")
+    grouped_df["team"] = np.where(player_id <= 10, "FIFATMA", "FIFATMB")
 
     # TODO[*] This wouldn't work if the player's frames didn't match the ball's
     # Check for null values in either the ball or player positions
@@ -113,9 +113,45 @@ frame_possession_phase_df = pd.merge_asof(
     left_on="frame",
     right_on="start_frame",
 )
-frame_possession_phase_df["frame"] = frame_possession_phase_df["frame"].astype(int)
+frame_possession_phase_df["frame"] = frame_possession_phase_df["frame"]
+frame_possession_phase_df["possession_phase_change"] = np.where(
+    frame_possession_phase_df["possession_phase"]
+    != frame_possession_phase_df["possession_phase"].shift(),
+    1,
+    0,
+)
+
+kick_off_df = find_half_start_frames("./data/Sample_Game_3_events.json")
+frame_possession_info_df = (
+    pd.merge_asof(
+        frame_possession_phase_df,
+        kick_off_df.astype(float),
+        left_on="frame",
+        right_on="start_frame",
+    )
+    .drop("period_y", axis=1)
+    .rename(
+        columns={
+            "start_frame_x": "phase_start_frame",
+            "start_frame_y": "half_start_frame",
+            "start_second": "period_start_second",
+            "period_x": "period",
+        }
+    )
+)
+frame_possession_info_df["match_second"] = (
+    frame_possession_info_df["frame"] - frame_possession_info_df["half_start_frame"]
+) * (1 / 25) + frame_possession_info_df["period_start_second"]
+frame_possession_info_df["phase_second"] = (
+    frame_possession_info_df["frame"] - frame_possession_info_df["phase_start_frame"]
+) * (1 / 25)
+
+frame_possession_info_df["frame"] = frame_possession_info_df["frame"].astype(int)
+
 frame_possession_phase_data = (
-    frame_possession_phase_df[["frame", "possession_phase"]]
+    frame_possession_info_df[
+        ["frame", "possession_phase", "period", "match_second", "phase_second"]
+    ]
     .set_index("frame")
     .to_dict(orient="index")
 )
@@ -126,7 +162,8 @@ structured_data = []
 
 for frame in tqdm(frames_list):
     # Initialize a dictionary for this frame - convert to int for serializing
-    frame_data = {"frame": int(frame)}
+    frame_data = frame_possession_phase_data[frame]
+    frame_data["frame"] = int(frame)
 
     # Extract ball position for this frame
     ball_data = ball_df[ball_df["frame"] == frame]
@@ -140,16 +177,67 @@ for frame in tqdm(frames_list):
 
     frame_data["players"] = player_data.to_dict(orient="index")
 
-    frame_data["possession_phase"] = frame_possession_phase_data[frame][
-        "possession_phase"
-    ]
+    # frame_data["possession_phase"] = frame_possession_phase_data[frame][
+    #     "possession_phase"
+    # ]
+    # frame_data["period"] = frame_possession_phase_data[frame]["period"]
+
+    frame_data["closest_opponent_to_ball"] = None
+    # TODO[*] Add a 'visible' tag for ball position so that I don't have to do the awkward X coord check
+    if (
+        frame_data["possession_phase"] != "neutral"
+        and frame_data["ball_position"]["x"] is not None
+    ):
+        frame_data["closest_opponent_to_ball"] = np.min(
+            [
+                player["distance_to_ball"]
+                for player in frame_data["players"].values()
+                if player["team"] != frame_data["possession_phase"]
+            ]
+        )
+
+    # TODO[**] This should be its own util, produced programmatically
+    frame_data["a_target_goal"] = [0, 34] if frame_data["period"] == 1 else [105, 34]
+    frame_data["b_target_goal"] = [105, 34] if frame_data["period"] == 1 else [0, 34]
+    frame_data["possession_target_end"] = (
+        frame_data["a_target_goal"][0]
+        if frame_data["possession_phase"] == "FIFATMA"
+        else frame_data["b_target_goal"][0]
+        if frame_data["possession_phase"] == "FIFATMB"
+        else None
+    )
+
+    frame_data["distance_from_target_goal"] = None
+    if frame_data["ball_position"]["x"] is not None:
+        if frame_data["possession_phase"] == "FIFATMA":
+            frame_data["distance_from_target_goal"] = np.sqrt(
+                (frame_data["a_target_goal"][0] - frame_data["ball_position"]["adj_x"])
+                ** 2
+                + (
+                    frame_data["a_target_goal"][1]
+                    - frame_data["ball_position"]["adj_y"]
+                )
+                ** 2
+            )
+        elif frame_data["possession_phase"] == "FIFATMB":
+            frame_data["distance_from_target_goal"] = np.sqrt(
+                (frame_data["b_target_goal"][0] - frame_data["ball_position"]["adj_x"])
+                ** 2
+                + (
+                    frame_data["b_target_goal"][1]
+                    - frame_data["ball_position"]["adj_y"]
+                )
+                ** 2
+            )
+        else:
+            pass
 
     # Append this frame's data to the list
     structured_data.append(frame_data)
 
 
 # ----------------------------------------------------------------
-
+db = get_database("metrica_tracking")
 new_collection = db["processed_frames_stage_one"]
 # Delete pre-existing data to upload afresh
 new_collection.delete_many(filter={})

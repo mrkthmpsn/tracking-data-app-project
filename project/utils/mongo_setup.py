@@ -20,3 +20,10 @@ def get_mongo_client():
 def get_database(db_name):
     client = get_mongo_client()
     return client[db_name]
+
+
+def get_collection(collection_name, db_name="metrica_tracking"):
+    db = get_database(db_name)
+    collection = db[collection_name]
+
+    return collection

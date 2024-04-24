@@ -83,3 +83,29 @@ def create_possession_changes_from_events(events_file_path: str) -> pd.DataFrame
     ]
 
     return possession_change_df
+
+
+def find_half_start_frames(events_file_path):
+    with open(events_file_path) as f:
+        events_file = json.load(f)
+
+    events_data = [MatchEvent(**event) for event in events_file["data"]]
+
+    match_data_df = pd.DataFrame(
+        [flatten_event(event_model) for event_model in events_data]
+    )
+
+    kick_off_records = (
+        match_data_df[match_data_df["event_type_name"] == "SET PIECE"]
+        .groupby("period")
+        .first()
+        .reset_index()[["period", "start_frame"]]
+        .to_dict(orient="records")
+    )
+
+    period_second_mapping = {1: 0, 2: 45 * 60}
+
+    for kick_off in kick_off_records:
+        kick_off["start_second"] = period_second_mapping[kick_off["period"]]
+
+    return pd.DataFrame.from_records(kick_off_records)
