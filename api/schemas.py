@@ -1,3 +1,7 @@
+"""
+File for schemas used in API validation & organisation
+"""
+
 from enum import Enum
 from typing import List, Optional
 
@@ -36,15 +40,7 @@ class FramePlayer(Coordinate):
 
 class APIFrame(BaseModel):
     """
-    What does this need...
-
-    Ball position
-    Possession phase
-    Team - players - do you even need this if you have the player team info in the players data?
-    Player info - position
-    In-block opportunities
-    Defensive block
-    Pitch control
+    Schema for a frame of data to be returned in the `frames` API endpoint
     """
 
     frame_idx: int

@@ -1,4 +1,7 @@
+import os
+
 import numpy as np
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
@@ -7,22 +10,23 @@ from tqdm import tqdm
 from api.schemas import APIFrame
 from project.utils.mongo_setup import get_database, get_collection
 
-# Create an instance of the FastAPI class
+load_dotenv()
+
+
 origins = [
-    "http://localhost:5173",  # Adjust this to the URL of your frontend
+    os.getenv("FE_LOCALHOST", ""),  # Localhost address
 ]
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["GET"],  # Allows all methods
-    allow_headers=["*"],  # Allows all headers
+    allow_methods=["GET"],
+    allow_headers=["*"],
 )
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
-# Define a GET endpoint at the URL path "/frames"
-# It expects two query parameters: "item_id" of type int and "name" of type str
+
 @app.get("/matches/")
 async def read_item(period_id: int):
     """
@@ -43,6 +47,7 @@ async def read_item(period_id: int):
             "frame"
         ]
 
+    # TODO[***] Improve structure of API
     return {
         "data": [
             {
@@ -54,7 +59,6 @@ async def read_item(period_id: int):
     }
 
 
-# TODO[***] Endpoint to get frames where in-block opps are, filter on that field, to render timeline comp
 # In real life this would be off a specific match but we only have one match so it can be general
 @app.get("/loose_block/")
 async def read_item():
@@ -93,27 +97,20 @@ async def read_item():
         for frame in opportunities_frames
     ]
 
+    # TODO[***] Improve structure of API
     return endpoint_data
 
 
 @app.get("/frames/")
 async def read_item(start_frame: int, end_frame: int):
     """
-    This endpoint responds to GET requests at "/items/".
+    This endpoint responds to GET requests at "/frames/".
     It requires two parameters:
-    - item_id: an integer identifying the item.
-    - name: a string representing the name of the item.
-
-    Args:
-    item_id (int): The ID of the item.
-    name (str): The name of the item.
-
-    Returns:
-    dict: A dictionary containing the item_id and name.
+    - start_frame: an integer identifying the item.
+    - end_frame: a string representing the name of the item.
     """
     # TODO[***] Use sequential IDs on the frames and filter by those on the API call
-    db = get_database("metrica_tracking")
-    collection = db["processed_frames_stage_three"]
+    collection = get_collection("processed_frames_stage_three")
 
     cursor = collection.find(
         {"frame": {"$gte": start_frame * 12, "$lte": end_frame * 12}}, batch_size=100
@@ -170,7 +167,5 @@ async def read_item(start_frame: int, end_frame: int):
         )
         formatted_frames[frame["frame"]] = schema.dict()
 
+    # TODO[***] Improve structure of API
     return formatted_frames
-
-
-# GET /items/?item_id=123&name=example
