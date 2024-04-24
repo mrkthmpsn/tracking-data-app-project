@@ -1,16 +1,16 @@
 """
 Pitch for non-pitch control post-processing tasks
 
-- Defensive block
-- Passing opportunity
-- Incisive passing opportunity
+Current processing features:
+- Presence of 'passing opportunity' in a frame
+- Defensive block boundaries
+- Whether attacking players are within defensive block
+- Closest opponent to each player
 """
 import math
-import time
+
 
 import numpy as np
-import pandas as pd
-from shapely import box, unary_union, Point, Polygon, MultiPolygon
 from tqdm import tqdm
 
 from project.utils.data_science.metrics import (
@@ -19,22 +19,18 @@ from project.utils.data_science.metrics import (
     search_area_for_value,
 )
 from project.utils.mongo_setup import get_database, get_collection
-from project.visualisation.utils import SoccerAnimation
 
-
-# db = get_database("metrica_tracking")
-# collection = db["processed_frames_pitch_control"]
 
 collection = get_collection(collection_name="processed_frames_stage_one")
 
-pre_cursor_time = time.perf_counter()
+
 cursor = collection.find({})
 cursor_data = list(cursor)
-post_cursor_time = time.perf_counter()
+
 passing_opportunities = annotate_passing_opportunities(
     frames=cursor_data, distance_threshold=2, time_threshold=1, frame_rate=25 / 12
 )
-post_passing_opportunities_time = time.perf_counter()
+
 for frame in tqdm(cursor_data):
     frame["passing_opportunity"] = len(passing_opportunities[frame["frame"]]) > 0
 
@@ -98,8 +94,7 @@ for frame in tqdm(cursor_data):
     #         if player_loc.within(polygon):
     #             player_data["in_block_receiver_opportunity"] = True
 
-final_time = time.perf_counter()
-print(f"total time: {final_time - pre_cursor_time}")
+
 db = get_database("metrica_tracking")
 new_collection = db["processed_frames_stage_three"]
 # Delete pre-existing data to upload afresh

@@ -1,16 +1,10 @@
-# Import FastAPI library
-import base64
-import json
-from typing import Optional
-
 import numpy as np
-from fastapi import FastAPI, Response
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from tqdm import tqdm
 
 from api.schemas import APIFrame
-from api.utils import reduce_pitch_control_field, unzip_pitch_control_field
 from project.utils.mongo_setup import get_database, get_collection
 
 # Create an instance of the FastAPI class

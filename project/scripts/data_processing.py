@@ -1,6 +1,16 @@
 """
-TODO[**]: File string
+File for initial processing of data from its raw form
 
+Current features processed:
+- Coordinate smoothing
+- Additional coordinates in metres
+- Object speed calculation
+- Reformat data into frame records TODO[**] Record structure
+- Player team
+- Frame possession phase (team A, team B, neutral)
+- Information about team target goals
+- Ball distance to possession team's target goal
+- Frame match time and possession phase time
 """
 import math
 
@@ -176,11 +186,6 @@ for frame in tqdm(frames_list):
     player_data.index = player_data.index.map(str)
 
     frame_data["players"] = player_data.to_dict(orient="index")
-
-    # frame_data["possession_phase"] = frame_possession_phase_data[frame][
-    #     "possession_phase"
-    # ]
-    # frame_data["period"] = frame_possession_phase_data[frame]["period"]
 
     frame_data["closest_opponent_to_ball"] = None
     # TODO[*] Add a 'visible' tag for ball position so that I don't have to do the awkward X coord check

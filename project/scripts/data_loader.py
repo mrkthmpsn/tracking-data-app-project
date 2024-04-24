@@ -1,10 +1,9 @@
 """
-TODO[**]: Add something to delete the current contents when running the script
-
+File for loading data from file to MongoDB database collection
 """
 from tqdm import tqdm
 
-from project.utils.mongo_setup import get_database
+from project.utils.mongo_setup import get_collection
 
 
 def parse_line(line):
@@ -26,8 +25,7 @@ def parse_line(line):
 # Takes ~50-60 minutes
 file_path = "data/Sample_Game_3_tracking.txt"
 
-db = get_database("metrica_tracking")
-collection = db["frames"]
+collection = get_collection(collection_name="frames")
 collection.delete_many({})
 
 with open(file_path, "r") as f:
