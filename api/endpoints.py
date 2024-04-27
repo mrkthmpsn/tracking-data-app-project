@@ -15,6 +15,8 @@ load_dotenv()
 
 origins = [
     os.getenv("FE_LOCALHOST", ""),  # Localhost address
+    os.getenv("FE_DOCKER", ""),
+    os.getenv("FE_URL", "")
 ]
 app = FastAPI()
 app.add_middleware(
