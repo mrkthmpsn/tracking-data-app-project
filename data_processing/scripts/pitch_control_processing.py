@@ -8,8 +8,10 @@ import math
 
 from tqdm import tqdm
 
-from project.utils.mongo_setup import get_database
-from project.utils.data_science.pitch_control import create_frame_pitch_control_field
+from data_processing.utils.mongo_setup import get_database
+from data_processing.utils.data_science.pitch_control import (
+    create_frame_pitch_control_field,
+)
 
 db = get_database("metrica_tracking")
 collection = db["processed_frames_stage_one"]

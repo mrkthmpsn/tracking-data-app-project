@@ -7,7 +7,9 @@ import numpy as np
 from pydantic import BaseModel
 from tqdm import tqdm
 
-from project.utils.data_science.pitch_control import decompress_gzip_pitch_control_field
+from data_processing.utils.data_science.pitch_control import (
+    decompress_gzip_pitch_control_field,
+)
 
 
 def mark_passing_opportunities(player_frames, time_threshold, frame_rate):

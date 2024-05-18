@@ -1,8 +1,8 @@
 """
 Test arena
 """
-from project.utils.mongo_setup import get_database, get_collection
-from project.visualisation.utils import SoccerAnimation
+from data_processing.utils.mongo_setup import get_database, get_collection
+from data_processing.visualisation.utils import SoccerAnimation
 
 collection = get_collection("processed_frames_stage_three")
 cursor = collection.find({})

@@ -4,12 +4,12 @@
 
 import numpy as np
 import pandas as pd
-from project.utils.tracking_processing import (
+from data_processing.utils.tracking_processing import (
     convert_to_meters,
     smooth_coordinates,
     calculate_speed,
 )
-from project.utils.constants import PITCH_WIDTH_M, PITCH_LENGTH_M
+from data_processing.utils.constants import PITCH_WIDTH_M, PITCH_LENGTH_M
 
 
 # Test for convert_to_meters function

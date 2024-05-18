@@ -6,7 +6,7 @@ import json
 import numpy as np
 import pandas as pd
 
-from project.utils.event_data.event_schemas import MatchEvent
+from data_processing.utils.event_data.event_schemas import MatchEvent
 
 
 def flatten_event(event: MatchEvent) -> dict:

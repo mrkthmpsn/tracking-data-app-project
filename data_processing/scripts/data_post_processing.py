@@ -13,12 +13,12 @@ import math
 import numpy as np
 from tqdm import tqdm
 
-from project.utils.data_science.metrics import (
+from data_processing.utils.data_science.metrics import (
     annotate_passing_opportunities,
     get_defensive_block_boundaries,
     search_area_for_value,
 )
-from project.utils.mongo_setup import get_database, get_collection
+from data_processing.utils.mongo_setup import get_database, get_collection
 
 
 collection = get_collection(collection_name="processed_frames_stage_one")

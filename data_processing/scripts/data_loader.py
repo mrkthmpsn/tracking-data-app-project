@@ -3,7 +3,7 @@ File for loading data from file to MongoDB database collection
 """
 from tqdm import tqdm
 
-from project.utils.mongo_setup import get_collection
+from data_processing.utils.mongo_setup import get_collection
 
 
 def parse_line(line):

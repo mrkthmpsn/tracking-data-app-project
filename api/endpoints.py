@@ -8,7 +8,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from tqdm import tqdm
 
 from api.schemas import APIFrame
-from project.utils.mongo_setup import get_database, get_collection
+from data_processing.utils.mongo_setup import get_database, get_collection
 
 load_dotenv()
 
@@ -16,7 +16,7 @@ load_dotenv()
 origins = [
     os.getenv("FE_LOCALHOST", ""),  # Localhost address
     os.getenv("FE_DOCKER", ""),
-    os.getenv("FE_URL", "")
+    os.getenv("FE_URL", ""),
 ]
 app = FastAPI()
 app.add_middleware(

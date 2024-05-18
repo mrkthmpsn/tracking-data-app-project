@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from scipy.signal import savgol_filter
 
-from project.utils.constants import PITCH_WIDTH_M, PITCH_LENGTH_M
+from data_processing.utils.constants import PITCH_WIDTH_M, PITCH_LENGTH_M
 
 
 # TODO[*]: Possibly refactor this util, not sure it's the right concept - but unimportant

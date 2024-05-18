@@ -9,7 +9,7 @@ import numpy as np
 from matplotlib import animation, pyplot as plt, patches
 from mplsoccer import Pitch
 
-from project.utils.data_science.metrics import (
+from data_processing.utils.data_science.metrics import (
     search_area_for_value,
     get_defensive_block_boundaries,
 )

@@ -3,7 +3,9 @@ TODO[**] Rewrite some hard-coded parts of this
 """
 
 import numpy as np
-from project.utils.data_science.pitch_control import vectorized_time_to_reach_grid
+from data_processing.utils.data_science.pitch_control import (
+    vectorized_time_to_reach_grid,
+)
 
 
 def test_max_speed_over_short_distance():

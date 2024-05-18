@@ -18,16 +18,16 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from project.utils.event_data.events_processing import (
+from data_processing.utils.event_data.events_processing import (
     create_possession_changes_from_events,
     find_half_start_frames,
 )
-from project.utils.tracking_processing import (
+from data_processing.utils.tracking_processing import (
     convert_to_meters,
     smooth_coordinates,
     calculate_speed,
 )
-from project.utils.mongo_setup import get_database, get_collection
+from data_processing.utils.mongo_setup import get_database, get_collection
 
 collection = get_collection("frames")
 
