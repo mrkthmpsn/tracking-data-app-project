@@ -112,7 +112,7 @@ The user-defined path could also line up nicely with the game models of coaching
 
 As well as the key frames, the statistics and 'alert thresholds' could also be user-defined. Despite my initial expectation, I like the permanent presence of a line chart for a specific metric, but my initial idea was that line charts would be available by hovering over the statistics in the left-hand panel. Something similar could possibly be implemented in a full version (maybe a changeable selection of pinned charts).
 
-##### 'Data insight accessibility' and metric creation addendum
+### 'Data insight accessibility' and metric creation addendum
 
 I used the phrase 'data insight accessibility' rather than 'data accessibility' deliberately, although partly just to try it out. 
 
