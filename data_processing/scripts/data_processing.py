@@ -31,7 +31,7 @@ from data_processing.utils.mongo_setup import get_database, get_collection
 
 collection = get_collection("frames")
 
-# Fetch every fifth frame
+# Fetch every twelfth frame
 cursor = collection.find(
     {"frame": {"$mod": [12, 0]}, "ball_position": {"$exists": True}}
 )
