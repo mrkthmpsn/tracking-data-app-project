@@ -24,6 +24,10 @@ The data inside the `data/` folder is the `Sample_Game_3` data from [Metrica Spo
 
 ## Running
 
+### Dependencies etc
+
+Run `pip install -r requirements.txt` to install dependencies locally or in a virtual environment. You can run the Dockerfile, which is used in the actual deployment, if you want, but idk that seems excessive.
+
 ### Database set-up
 Running the app on an external database isn't strictly necessary. If running locally, the processing in `data_processing/scripts/` could save to local files, which the API endpoints could also draw from.
 
