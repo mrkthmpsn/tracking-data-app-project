@@ -8,11 +8,14 @@ This repo includes the processing of raw tracking data, and storage into a Mongo
 For a project write-up that covers the back-end and front-end, see `project_writeup.md`.
 
 ## Notable technologies
-- **FastAPI** for API
-- **MongoDB Atlas** & `pymongo` for database
-- `mplsoccer` for visualisation during development 
-- **ChatGPT 4** for a lot of coding & general development help
-- `tqdm` as an indispensable 'progress bar during processing' sanity-maintenance tool
+✨ = new; 👨‍‍🏫 = learning; 🤝 = familiar
+- **FastAPI** for API ✨
+- **MongoDB Atlas** & `pymongo` for database ✨
+- **Metrica Sports** data 👨‍‍🏫
+- `mplsoccer` for visualisation during development 👨‍‍🏫
+- **ChatGPT 4** for a lot of coding & general development help 👨‍‍🏫
+- `tqdm` as an indispensable 'progress bar during processing' sanity-maintenance tool 🤝
+- **Docker** for production containerisation 👨‍‍🏫
 
 ## Other documentation
 
